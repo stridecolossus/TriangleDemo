@@ -1,6 +1,5 @@
 package org.sarge.jove.demo.triangle;
 
-import org.sarge.jove.common.Handle;
 import org.sarge.jove.platform.vulkan.VkQueueFlag;
 import org.sarge.jove.platform.vulkan.api.VulkanLibrary;
 import org.sarge.jove.platform.vulkan.common.Queue;
@@ -18,8 +17,8 @@ class DeviceConfiguration {
 	private final Selector graphics = Selector.of(VkQueueFlag.GRAPHICS);
 	private final Selector presentation;
 
-	public DeviceConfiguration(Handle surface) {
-		presentation = Selector.of(surface);
+	public DeviceConfiguration(Surface surface) {
+		presentation = Selector.of(surface.handle());
 	}
 
 	@Bean
@@ -30,12 +29,6 @@ class DeviceConfiguration {
 				.filter(presentation)
 				.findAny()
 				.orElseThrow(() -> new RuntimeException("No suitable physical device available"));
-	}
-
-	@SuppressWarnings("static-method")
-	@Bean
-	public Surface surface(Handle handle, PhysicalDevice dev) {
-		return new Surface(handle, dev);
 	}
 
 	@Bean

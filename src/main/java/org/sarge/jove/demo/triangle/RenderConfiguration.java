@@ -6,6 +6,7 @@ import org.sarge.jove.platform.vulkan.common.Command.Buffer;
 import org.sarge.jove.platform.vulkan.common.Command.Pool;
 import org.sarge.jove.platform.vulkan.common.Queue;
 import org.sarge.jove.platform.vulkan.core.LogicalDevice;
+import org.sarge.jove.platform.vulkan.core.LogicalDevice.Semaphore;
 import org.sarge.jove.platform.vulkan.core.Work;
 import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
 import org.sarge.jove.platform.vulkan.render.DrawCommand;
@@ -36,10 +37,14 @@ public class RenderConfiguration {
 	}
 
 	@Bean
-	public static ApplicationRunner render(Swapchain swapchain, Buffer render) {
+	public static ApplicationRunner render(LogicalDevice dev, Swapchain swapchain, Buffer render) {
 		return args -> {
+
+			final Semaphore semaphore = dev.semaphore();
+
 			// Start next frame
-			final int index = swapchain.acquire(null, null);
+			final int index = swapchain.acquire(semaphore, null);
+			semaphore.close();
 
 			// Render frame
 			//final VulkanLibrary lib = dev.library();
