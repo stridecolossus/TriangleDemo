@@ -18,7 +18,7 @@ class DeviceConfiguration {
 	private final Selector presentation;
 
 	public DeviceConfiguration(Surface surface) {
-		presentation = Selector.of(surface.handle());
+		presentation = Selector.of(surface);
 	}
 
 	@Bean
