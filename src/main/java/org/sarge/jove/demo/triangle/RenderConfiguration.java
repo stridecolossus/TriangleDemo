@@ -2,11 +2,11 @@ package org.sarge.jove.demo.triangle;
 
 import java.util.Set;
 
-import org.sarge.jove.platform.vulkan.common.Command.Buffer;
-import org.sarge.jove.platform.vulkan.common.Command.Pool;
 import org.sarge.jove.platform.vulkan.common.Queue;
+import org.sarge.jove.platform.vulkan.core.Command.Buffer;
+import org.sarge.jove.platform.vulkan.core.Command.Pool;
 import org.sarge.jove.platform.vulkan.core.LogicalDevice;
-import org.sarge.jove.platform.vulkan.core.LogicalDevice.Semaphore;
+import org.sarge.jove.platform.vulkan.core.Semaphore;
 import org.sarge.jove.platform.vulkan.core.Work;
 import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
 import org.sarge.jove.platform.vulkan.render.DrawCommand;
@@ -39,28 +39,23 @@ public class RenderConfiguration {
 	@Bean
 	public static ApplicationRunner render(LogicalDevice dev, Swapchain swapchain, Buffer render) {
 		return args -> {
-
-			final Semaphore semaphore = dev.semaphore();
-
 			// Start next frame
+			final Semaphore semaphore = Semaphore.create(dev);
 			final int index = swapchain.acquire(semaphore, null);
-			semaphore.close();
 
 			// Render frame
-			//final VulkanLibrary lib = dev.library();
-			Work.of(render).submit(null);
-
-			// TODO
 			final Pool pool = render.pool();
+			Work.of(render).submit(null);
 			pool.waitIdle();
-//			queue.waitIdle(lib);
 
 			// Present frame
-			// TODO - present should accept frame index?
-			swapchain.present(pool.queue(), Set.of());
+			swapchain.present(pool.queue(), index, Set.of());
 
 			// TODO
 			Thread.sleep(1000);
+
+			// Cleanup
+			semaphore.destroy();
 		};
 	}
 }

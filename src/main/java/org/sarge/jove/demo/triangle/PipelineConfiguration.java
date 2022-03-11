@@ -1,29 +1,29 @@
 package org.sarge.jove.demo.triangle;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.sarge.jove.io.DataSource;
+import org.sarge.jove.io.ResourceLoaderAdapter;
 import org.sarge.jove.platform.vulkan.VkCullMode;
 import org.sarge.jove.platform.vulkan.VkShaderStage;
 import org.sarge.jove.platform.vulkan.core.LogicalDevice;
-import org.sarge.jove.platform.vulkan.core.Shader;
-import org.sarge.jove.platform.vulkan.core.Shader.ShaderLoader;
 import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
 import org.sarge.jove.platform.vulkan.pipeline.PipelineLayout;
+import org.sarge.jove.platform.vulkan.pipeline.Shader;
 import org.sarge.jove.platform.vulkan.render.RenderPass;
 import org.sarge.jove.platform.vulkan.render.Swapchain;
-import org.sarge.jove.util.DataSource;
-import org.sarge.jove.util.ResourceLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 class PipelineConfiguration {
 	private final LogicalDevice dev;
-	private final ResourceLoader<String, Shader> loader;
+	private final ResourceLoaderAdapter<InputStream, Shader> loader;
 
 	public PipelineConfiguration(LogicalDevice dev, DataSource src) {
 		this.dev = dev;
-		this.loader = ResourceLoader.of(src, new ShaderLoader(dev));
+		this.loader = new ResourceLoaderAdapter<>(src, new Shader.Loader(dev));
 	}
 
 	@Bean
@@ -38,7 +38,7 @@ class PipelineConfiguration {
 
 	@Bean
 	PipelineLayout pipelineLayout() {
-		return new PipelineLayout.Builder(dev).build();
+		return new PipelineLayout.Builder().build(dev);
 	}
 
 	@Bean
@@ -46,7 +46,9 @@ class PipelineConfiguration {
 		return new Pipeline.Builder()
 				.layout(layout)
 				.pass(pass)
-				.viewport(swapchain.extents())
+				.viewport()
+					.viewportAndScissor(swapchain.extents().rectangle())
+					.build()
 				.rasterizer()
 					.cull(VkCullMode.NONE) // TODO
 					.build()
@@ -56,6 +58,6 @@ class PipelineConfiguration {
 				.shader(VkShaderStage.FRAGMENT)
 					.shader(fragment)
 					.build()
-				.build(dev);
+				.build(null, dev);
 	}
 }

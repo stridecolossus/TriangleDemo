@@ -1,9 +1,10 @@
 package org.sarge.jove.demo.triangle;
 
 import org.sarge.jove.platform.desktop.Desktop;
-import org.sarge.jove.platform.vulkan.api.VulkanLibrary;
-import org.sarge.jove.platform.vulkan.common.ValidationLayer;
+import org.sarge.jove.platform.vulkan.core.HandlerManager.Handler;
 import org.sarge.jove.platform.vulkan.core.Instance;
+import org.sarge.jove.platform.vulkan.core.VulkanLibrary;
+import org.sarge.jove.platform.vulkan.util.ValidationLayer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +23,15 @@ class VulkanConfiguration {
 				.extension(VulkanLibrary.EXTENSION_DEBUG_UTILS)
 				.extensions(desktop.extensions())
 				.layer(ValidationLayer.STANDARD_VALIDATION)
-				.build(lib)
-				.handler()
+				.build(lib);
+	}
+
+	@Bean
+	static Handler diagnostics(Instance instance) {
+		return instance
+				.manager()
+				.builder()
 				.init()
-				.attach();
+				.build();
 	}
 }
