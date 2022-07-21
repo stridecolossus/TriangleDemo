@@ -1,20 +1,13 @@
 package org.sarge.jove.demo.triangle;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
-import org.sarge.jove.io.DataSource;
-import org.sarge.jove.io.ResourceLoaderAdapter;
-import org.sarge.jove.platform.vulkan.VkCullMode;
+import org.sarge.jove.io.*;
 import org.sarge.jove.platform.vulkan.VkShaderStage;
 import org.sarge.jove.platform.vulkan.core.LogicalDevice;
-import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
-import org.sarge.jove.platform.vulkan.pipeline.PipelineLayout;
-import org.sarge.jove.platform.vulkan.pipeline.Shader;
-import org.sarge.jove.platform.vulkan.render.RenderPass;
-import org.sarge.jove.platform.vulkan.render.Swapchain;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.sarge.jove.platform.vulkan.pipeline.*;
+import org.sarge.jove.platform.vulkan.render.*;
+import org.springframework.context.annotation.*;
 
 @Configuration
 class PipelineConfiguration {
@@ -46,18 +39,9 @@ class PipelineConfiguration {
 		return new Pipeline.Builder()
 				.layout(layout)
 				.pass(pass)
-				.viewport()
-					.viewportAndScissor(swapchain.extents().rectangle())
-					.build()
-				.rasterizer()
-					.cull(VkCullMode.NONE) // TODO
-					.build()
-				.shader(VkShaderStage.VERTEX)
-					.shader(vertex)
-					.build()
-				.shader(VkShaderStage.FRAGMENT)
-					.shader(fragment)
-					.build()
+				.viewport(swapchain.extents().rectangle())
+				.shader(VkShaderStage.VERTEX, vertex)
+				.shader(VkShaderStage.FRAGMENT, fragment)
 				.build(null, dev);
 	}
 }

@@ -1,15 +1,10 @@
 package org.sarge.jove.demo.triangle;
 
-import org.sarge.jove.common.Dimensions;
-import org.sarge.jove.common.Handle;
-import org.sarge.jove.platform.desktop.Desktop;
-import org.sarge.jove.platform.desktop.Window;
+import org.sarge.jove.common.*;
+import org.sarge.jove.platform.desktop.*;
 import org.sarge.jove.platform.vulkan.core.Instance;
-import org.sarge.jove.platform.vulkan.core.PhysicalDevice;
-import org.sarge.jove.platform.vulkan.core.Surface;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 @Configuration
 class DesktopConfiguration {
@@ -25,18 +20,12 @@ class DesktopConfiguration {
 		return new Window.Builder()
 				.title(title)
 				.size(new Dimensions(1024, 768))
-				.property(Window.Property.DISABLE_OPENGL)
+				.hint(Window.Hint.DISABLE_OPENGL)
 				.build(desktop);
 	}
 
-	@Bean
-	public static Surface surface(Instance instance, Window window) {
-		final Handle handle = window.surface(instance.handle());
-		return new Surface(handle, instance);
-	}
-
-	@Bean
-	public static Surface.Properties properties(Surface surface, PhysicalDevice dev) {
-		return surface.properties(dev);
+	@Bean("surface-handle")
+	public static Handle surface(Instance instance, Window window) {
+		return window.surface(instance.handle());
 	}
 }

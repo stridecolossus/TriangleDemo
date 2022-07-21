@@ -1,13 +1,10 @@
 package org.sarge.jove.demo.triangle;
 
 import org.sarge.jove.platform.desktop.Desktop;
-import org.sarge.jove.platform.vulkan.core.HandlerManager.Handler;
-import org.sarge.jove.platform.vulkan.core.Instance;
-import org.sarge.jove.platform.vulkan.core.VulkanLibrary;
+import org.sarge.jove.platform.vulkan.core.*;
 import org.sarge.jove.platform.vulkan.util.ValidationLayer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 @Configuration
 class VulkanConfiguration {
@@ -28,10 +25,6 @@ class VulkanConfiguration {
 
 	@Bean
 	static Handler diagnostics(Instance instance) {
-		return instance
-				.manager()
-				.builder()
-				.init()
-				.build();
+		return instance.handler().build();
 	}
 }

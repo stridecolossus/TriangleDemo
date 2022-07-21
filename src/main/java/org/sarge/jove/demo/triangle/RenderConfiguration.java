@@ -1,21 +1,13 @@
 package org.sarge.jove.demo.triangle;
 
-import java.util.Set;
-
 import org.sarge.jove.platform.vulkan.common.Queue;
-import org.sarge.jove.platform.vulkan.core.Command.Buffer;
-import org.sarge.jove.platform.vulkan.core.Command.Pool;
-import org.sarge.jove.platform.vulkan.core.LogicalDevice;
-import org.sarge.jove.platform.vulkan.core.Semaphore;
-import org.sarge.jove.platform.vulkan.core.Work;
+import org.sarge.jove.platform.vulkan.core.*;
+import org.sarge.jove.platform.vulkan.core.Command.*;
 import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
-import org.sarge.jove.platform.vulkan.render.DrawCommand;
-import org.sarge.jove.platform.vulkan.render.FrameBuffer;
-import org.sarge.jove.platform.vulkan.render.Swapchain;
+import org.sarge.jove.platform.vulkan.render.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 @Configuration
 public class RenderConfiguration {
@@ -49,9 +41,9 @@ public class RenderConfiguration {
 			pool.waitIdle();
 
 			// Present frame
-			swapchain.present(pool.queue(), index, Set.of());
+			swapchain.present(pool.queue(), index, semaphore);
 
-			// TODO
+			// Bodge
 			Thread.sleep(1000);
 
 			// Cleanup

@@ -1,32 +1,27 @@
 package org.sarge.jove.demo.triangle;
 
-import java.util.Set;
-
+import org.sarge.jove.common.Handle;
 import org.sarge.jove.platform.vulkan.VkQueueFlag;
 import org.sarge.jove.platform.vulkan.common.Queue;
-import org.sarge.jove.platform.vulkan.core.Instance;
-import org.sarge.jove.platform.vulkan.core.LogicalDevice;
-import org.sarge.jove.platform.vulkan.core.PhysicalDevice;
+import org.sarge.jove.platform.vulkan.core.*;
+import org.sarge.jove.platform.vulkan.core.LogicalDevice.RequiredQueue;
 import org.sarge.jove.platform.vulkan.core.PhysicalDevice.Selector;
-import org.sarge.jove.platform.vulkan.core.Surface;
-import org.sarge.jove.platform.vulkan.core.VulkanLibrary;
 import org.sarge.jove.platform.vulkan.util.ValidationLayer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 @Configuration
 class DeviceConfiguration {
-	private final Selector graphics = Selector.of(Set.of(VkQueueFlag.GRAPHICS));
+	private final Selector graphics = Selector.of(VkQueueFlag.GRAPHICS);
 	private final Selector presentation;
 
-	public DeviceConfiguration(Surface surface) {
+	public DeviceConfiguration(Handle surface) {
 		presentation = Selector.of(surface);
 	}
 
 	@Bean
 	public PhysicalDevice physical(Instance instance) {
-		return PhysicalDevice
-				.devices(instance)
+		return new PhysicalDevice.Enumerator(instance)
+				.devices()
 				.filter(graphics)
 				.filter(presentation)
 				.findAny()
@@ -38,18 +33,18 @@ class DeviceConfiguration {
 		return new LogicalDevice.Builder(dev)
 				.extension(VulkanLibrary.EXTENSION_SWAP_CHAIN)
 				.layer(ValidationLayer.STANDARD_VALIDATION)
-				.queue(graphics.family())
-				.queue(presentation.family())
+				.queue(new RequiredQueue(graphics.select(dev)))
+				.queue(new RequiredQueue(presentation.select(dev)))
 				.build();
 	}
 
 	@Bean
 	public Queue graphics(LogicalDevice dev) {
-		return dev.queue(graphics.family());
+		return dev.queue(graphics.select(dev.parent()));
 	}
 
 	@Bean
 	public Queue presentation(LogicalDevice dev) {
-		return dev.queue(presentation.family());
+		return dev.queue(presentation.select(dev.parent()));
 	}
 }
