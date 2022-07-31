@@ -6,7 +6,6 @@ import org.sarge.jove.common.*;
 import org.sarge.jove.platform.vulkan.*;
 import org.sarge.jove.platform.vulkan.core.*;
 import org.sarge.jove.platform.vulkan.render.*;
-import org.sarge.jove.platform.vulkan.render.Subpass.Reference;
 import org.springframework.context.annotation.*;
 
 @Configuration
@@ -34,21 +33,13 @@ class PresentationConfiguration {
 				.finalLayout(VkImageLayout.PRESENT_SRC_KHR)
 				.build();
 
-		// Create sub-pass
-		final Subpass subpass = new Subpass.Builder()
-				.colour(new Reference(attachment, VkImageLayout.COLOR_ATTACHMENT_OPTIMAL))
-				.build();
-
 		// Create render pass
+		final Subpass subpass = Subpass.of(attachment);
 		return RenderPass.create(dev, List.of(subpass));
 	}
 
 	@Bean
 	public static FrameBuffer frame(Swapchain swapchain, RenderPass pass) {
-		return new FrameBuffer.Builder()
-				.pass(pass)
-				.extents(swapchain.extents())
-				.build(swapchain.attachments())
-				.get(0);
+		return FrameBuffer.create(pass, swapchain.extents(), swapchain.attachments().subList(0, 0));
 	}
 }
