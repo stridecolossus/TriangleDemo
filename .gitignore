@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+*.frag
+src/main/resources/spv.triangle.frag
+src/main/resources/spv.triangle.vert
