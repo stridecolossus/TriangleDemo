@@ -37,10 +37,13 @@ public class RenderConfiguration {
 
 			// Render frame
 			final Pool pool = render.pool();
-			Work.of(render).submit(null);
-			pool.waitIdle();
+			new Work.Builder(pool)
+					.add(render)
+					.build()
+					.submit(null);
 
 			// Present frame
+			pool.waitIdle();
 			swapchain.present(pool.queue(), index, semaphore);
 
 			// Bodge
