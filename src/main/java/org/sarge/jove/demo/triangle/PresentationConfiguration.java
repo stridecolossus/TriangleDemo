@@ -1,7 +1,5 @@
 package org.sarge.jove.demo.triangle;
 
-import java.util.List;
-
 import org.sarge.jove.common.*;
 import org.sarge.jove.platform.vulkan.*;
 import org.sarge.jove.platform.vulkan.core.*;
@@ -34,8 +32,11 @@ class PresentationConfiguration {
 				.build();
 
 		// Create render pass
-		final Subpass subpass = Subpass.of(attachment);
-		return RenderPass.create(dev, List.of(subpass));
+		return new RenderPass.Builder()
+				.subpass()
+					.colour(attachment)
+					.build()
+				.build(dev);
 	}
 
 	@Bean
