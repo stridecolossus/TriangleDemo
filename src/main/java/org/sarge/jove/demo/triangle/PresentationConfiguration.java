@@ -15,10 +15,10 @@ class PresentationConfiguration {
 
 	@Bean
 	public static Swapchain swapchain(LogicalDevice dev, Surface surface) {
-		return new Swapchain.Builder(dev, surface)
+		return new Swapchain.Builder(surface)
 				.count(2)
 				.clear(new Colour(0.3f, 0.3f, 0.3f, 1))
-				.build();
+				.build(dev);
 	}
 
 	@Bean
