@@ -1,9 +1,10 @@
 package org.sarge.jove.demo.triangle;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.sarge.jove.io.ClasspathDataSource;
-import org.sarge.jove.io.DataSource;
+import org.apache.commons.lang3.builder.*;
+import org.sarge.jove.common.TransientObject;
+import org.sarge.jove.io.*;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,18 @@ public class TriangleDemo {
 	@Bean
 	public static DataSource source() {
 		return new ClasspathDataSource();
+	}
+
+	@Bean
+	static DestructionAwareBeanPostProcessor destroyer() {
+		return new DestructionAwareBeanPostProcessor() {
+			@Override
+			public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
+				if(bean instanceof TransientObject obj && !obj.isDestroyed()) {
+					obj.destroy();
+				}
+			}
+		};
 	}
 
 	@SuppressWarnings("resource")

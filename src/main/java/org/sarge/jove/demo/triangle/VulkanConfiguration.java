@@ -17,7 +17,7 @@ class VulkanConfiguration {
 	public static Instance instance(VulkanLibrary lib, Desktop desktop, @Value("${application.title}") String title) {
 		return new Instance.Builder()
 				.name(title)
-				.extension(VulkanLibrary.EXTENSION_DEBUG_UTILS)
+				.extension(Handler.EXTENSION)
 				.extensions(desktop.extensions())
 				.layer(ValidationLayer.STANDARD_VALIDATION)
 				.build(lib);
