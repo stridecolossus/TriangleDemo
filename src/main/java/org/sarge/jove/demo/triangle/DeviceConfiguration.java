@@ -21,8 +21,8 @@ class DeviceConfiguration {
 
 	@Bean
 	public PhysicalDevice physical(Instance instance) {
-		return new PhysicalDevice.Enumerator(instance)
-				.devices()
+		return PhysicalDevice
+				.devices(instance)
 				.filter(graphics)
 				.filter(presentation)
 				.findAny()
