@@ -36,12 +36,10 @@ class PipelineConfiguration {
 
 	@Bean
 	public Pipeline pipeline(RenderPass pass, Swapchain swapchain, Shader vertex, Shader fragment, PipelineLayout layout) {
-		return new Pipeline.Builder()
-				.layout(layout)
-				.pass(pass)
+		return new GraphicsPipelineBuilder(pass)
 				.viewport(swapchain.extents().rectangle())
-				.shader(VkShaderStage.VERTEX, vertex)
-				.shader(VkShaderStage.FRAGMENT, fragment)
-				.build(null, dev);
+				.shader(new ProgrammableShaderStage(VkShaderStage.VERTEX, vertex))
+				.shader(new ProgrammableShaderStage(VkShaderStage.FRAGMENT, fragment))
+				.build(dev, layout);
 	}
 }

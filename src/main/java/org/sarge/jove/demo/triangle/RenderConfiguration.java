@@ -1,6 +1,5 @@
 package org.sarge.jove.demo.triangle;
 
-import org.sarge.jove.platform.vulkan.common.Queue;
 import org.sarge.jove.platform.vulkan.core.*;
 import org.sarge.jove.platform.vulkan.core.Command.*;
 import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
@@ -12,7 +11,7 @@ import org.springframework.context.annotation.*;
 @Configuration
 public class RenderConfiguration {
 	@Bean
-	public static Pool pool(LogicalDevice dev, @Qualifier("presentation") Queue presentation) {
+	public static Pool pool(LogicalDevice dev, @Qualifier("presentation") WorkQueue presentation) {
 		return Pool.create(dev, presentation);
 	}
 
