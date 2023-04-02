@@ -1,5 +1,6 @@
 package org.sarge.jove.demo.triangle;
 
+import org.sarge.jove.platform.vulkan.VkSubpassContents;
 import org.sarge.jove.platform.vulkan.core.*;
 import org.sarge.jove.platform.vulkan.core.Command.*;
 import org.sarge.jove.platform.vulkan.pipeline.Pipeline;
@@ -18,9 +19,9 @@ public class RenderConfiguration {
 	@Bean
 	public static Buffer sequence(Pool pool, FrameBuffer frame, Pipeline pipeline) {
 		return pool
-				.allocate()
+				.primary()
 				.begin()
-					.add(frame.begin())
+					.add(frame.begin(VkSubpassContents.INLINE))
 					.add(pipeline.bind())
 					.add(DrawCommand.draw(3))
 					.add(FrameBuffer.END)
@@ -34,16 +35,11 @@ public class RenderConfiguration {
 			final Semaphore semaphore = Semaphore.create(dev);
 			final int index = swapchain.acquire(semaphore, null);
 
-			// Render frame
-			final Pool pool = render.pool();
-			new Work.Builder(pool)
-					.add(render)
-					.build()
-					.submit(null);
+			// Render frame and block
+			Work.submit(render);
 
 			// Present frame
-			pool.waitIdle();
-			swapchain.present(pool.queue(), index, semaphore);
+			swapchain.present(render.pool().queue(), index, semaphore);
 
 			// Bodge
 			Thread.sleep(1000);

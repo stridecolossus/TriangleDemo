@@ -28,6 +28,6 @@ class PresentationConfiguration {
 
 	@Bean
 	public static FrameBuffer frame(Swapchain swapchain, RenderPass pass) {
-		return FrameBuffer.create(pass, swapchain.extents(), swapchain.attachments().subList(0, 1));
+		return FrameBuffer.create(pass, new Rectangle(swapchain.extents()), swapchain.attachments().subList(0, 1));
 	}
 }
