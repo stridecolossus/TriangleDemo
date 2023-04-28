@@ -20,7 +20,8 @@ class DesktopConfiguration {
 		return new Window.Builder()
 				.title(title)
 				.size(new Dimensions(1024, 768))
-				.hint(Window.Hint.DISABLE_OPENGL)
+				.hint(Window.Hint.RESIZABLE, false)
+				.hint(Window.Hint.CLIENT_API, 0)
 				.build(desktop);
 	}
 
