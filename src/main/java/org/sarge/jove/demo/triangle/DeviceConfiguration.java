@@ -1,27 +1,25 @@
 package org.sarge.jove.demo.triangle;
-
-import org.sarge.jove.common.Handle;
 import org.sarge.jove.platform.vulkan.VkQueueFlag;
 import org.sarge.jove.platform.vulkan.core.*;
 import org.sarge.jove.platform.vulkan.core.LogicalDevice.RequiredQueue;
 import org.sarge.jove.platform.vulkan.core.PhysicalDevice.Selector;
 import org.sarge.jove.platform.vulkan.render.Swapchain;
-import org.sarge.jove.platform.vulkan.util.ValidationLayer;
 import org.springframework.context.annotation.*;
 
 @Configuration
 class DeviceConfiguration {
-	private final Selector graphics = Selector.of(VkQueueFlag.GRAPHICS);
+	private final Selector graphics;
 	private final Selector presentation;
 
-	public DeviceConfiguration(Handle surface) {
-		presentation = Selector.of(surface);
+	public DeviceConfiguration(VulkanSurface surface) {
+		this.graphics = Selector.queue(VkQueueFlag.GRAPHICS);
+		this.presentation = new Selector(surface::isPresentationSupported);
 	}
 
 	@Bean
-	public PhysicalDevice physical(Instance instance) {
+	public PhysicalDevice physical(Instance instance, VulkanCoreLibrary lib) {
 		return PhysicalDevice
-				.devices(instance)
+				.enumerate(instance, lib)
 				.filter(graphics)
 				.filter(presentation)
 				.findAny()
@@ -29,22 +27,22 @@ class DeviceConfiguration {
 	}
 
 	@Bean
-	public LogicalDevice device(PhysicalDevice dev) {
-		return new LogicalDevice.Builder(dev)
+	public LogicalDevice device(PhysicalDevice device, VulkanCoreLibrary lib) {
+		return new LogicalDevice.Builder(device)
 				.extension(Swapchain.EXTENSION)
-				.layer(ValidationLayer.STANDARD_VALIDATION)
-				.queue(new RequiredQueue(graphics.select(dev)))
-				.queue(new RequiredQueue(presentation.select(dev)))
-				.build();
+				.layer(DiagnosticHandler.STANDARD_VALIDATION)
+				.queue(new RequiredQueue(graphics.family(device)))
+				//.queue(new RequiredQueue(presentation.family(device)))
+				.build(lib);
 	}
 
 	@Bean
-	public WorkQueue graphics(LogicalDevice dev) {
-		return dev.queue(graphics.select(dev.parent()));
+	public WorkQueue graphics(LogicalDevice dev, PhysicalDevice physical) {
+		return dev.queues().get(graphics.family(physical)).getFirst();
 	}
 
 	@Bean
-	public WorkQueue presentation(LogicalDevice dev) {
-		return dev.queue(presentation.select(dev.parent()));
+	public WorkQueue presentation(LogicalDevice dev, PhysicalDevice physical) {
+		return dev.queues().get(presentation.family(physical)).getFirst();
 	}
 }

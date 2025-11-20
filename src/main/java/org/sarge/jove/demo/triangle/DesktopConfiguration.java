@@ -11,7 +11,9 @@ class DesktopConfiguration {
 	@Bean
 	public static Desktop desktop() {
 		final Desktop desktop = Desktop.create();
-		if(!desktop.isVulkanSupported()) throw new RuntimeException("Vulkan not supported");
+		if(!desktop.isVulkanSupported()) {
+			throw new RuntimeException("Vulkan not supported");
+		}
 		return desktop;
 	}
 
@@ -20,7 +22,7 @@ class DesktopConfiguration {
 		return new Window.Builder()
 				.title(title)
 				.size(new Dimensions(1024, 768))
-				.hint(Window.Hint.RESIZABLE, false)
+				.hint(Window.Hint.RESIZABLE, 0)
 				.hint(Window.Hint.CLIENT_API, 0)
 				.build(desktop);
 	}

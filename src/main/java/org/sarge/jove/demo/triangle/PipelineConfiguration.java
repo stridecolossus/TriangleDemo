@@ -1,32 +1,33 @@
 package org.sarge.jove.demo.triangle;
 
-import java.io.*;
+import java.io.IOException;
+import java.nio.file.Paths;
 
-import org.sarge.jove.io.*;
-import org.sarge.jove.platform.vulkan.VkShaderStage;
+import org.sarge.jove.platform.vulkan.*;
 import org.sarge.jove.platform.vulkan.core.LogicalDevice;
 import org.sarge.jove.platform.vulkan.pipeline.*;
+import org.sarge.jove.platform.vulkan.pipeline.Shader.ShaderLoader;
 import org.sarge.jove.platform.vulkan.render.*;
 import org.springframework.context.annotation.*;
 
 @Configuration
 class PipelineConfiguration {
 	private final LogicalDevice dev;
-	private final ResourceLoaderAdapter<InputStream, Shader> loader;
 
-	public PipelineConfiguration(LogicalDevice dev, DataSource src) {
+	public PipelineConfiguration(LogicalDevice dev) {
 		this.dev = dev;
-		this.loader = new ResourceLoaderAdapter<>(src, new Shader.Loader(dev));
 	}
 
 	@Bean
 	public Shader vertex() throws IOException {
-		return loader.load("spv.triangle.vert");
+		final var loader = new ShaderLoader(dev);
+		return loader.load(Paths.get("src/main/resources/spv.triangle.vert"));
 	}
 
 	@Bean
 	public Shader fragment() throws IOException {
-		return loader.load("spv.triangle.frag");
+		final var loader = new ShaderLoader(dev);
+		return loader.load(Paths.get("src/main/resources/spv.triangle.frag"));
 	}
 
 	@Bean
@@ -36,10 +37,13 @@ class PipelineConfiguration {
 
 	@Bean
 	public Pipeline pipeline(RenderPass pass, Swapchain swapchain, Shader vertex, Shader fragment, PipelineLayout layout) {
-		return new GraphicsPipelineBuilder(pass)
-				.viewport(swapchain.extents().rectangle())
-				.shader(new ProgrammableShaderStage(VkShaderStage.VERTEX, vertex))
-				.shader(new ProgrammableShaderStage(VkShaderStage.FRAGMENT, fragment))
-				.build(dev, layout);
+		final var builder = new GraphicsPipelineBuilder();
+		builder.layout(layout);
+		builder.pass(pass);
+		builder.viewport().viewportAndScissor(swapchain.extents().rectangle());
+		builder.rasterizer().cull(VkCullMode.NONE);
+		builder.shader(new ProgrammableShaderStage(VkShaderStage.VERTEX, vertex));
+		builder.shader(new ProgrammableShaderStage(VkShaderStage.FRAGMENT, fragment));
+		return builder.build(dev);
 	}
 }

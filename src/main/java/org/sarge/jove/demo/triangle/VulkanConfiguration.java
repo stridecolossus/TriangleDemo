@@ -1,30 +1,30 @@
 package org.sarge.jove.demo.triangle;
 
+import org.sarge.jove.foreign.DefaultRegistry;
 import org.sarge.jove.platform.desktop.Desktop;
 import org.sarge.jove.platform.vulkan.core.*;
-import org.sarge.jove.platform.vulkan.util.ValidationLayer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
 @Configuration
 class VulkanConfiguration {
 	@Bean
-	public static VulkanLibrary library() {
-		return VulkanLibrary.create();
+	public static VulkanCoreLibrary library() {
+		return Vulkan.create();
 	}
 
 	@Bean
-	public static Instance instance(VulkanLibrary lib, Desktop desktop, @Value("${application.title}") String title) {
+	public static Instance instance(VulkanCoreLibrary lib, Desktop desktop, @Value("${application.title}") String title) {
 		return new Instance.Builder()
 				.name(title)
-				.extension(Handler.EXTENSION)
+				.extension(DiagnosticHandler.EXTENSION)
+				.layer(DiagnosticHandler.STANDARD_VALIDATION)
 				.extensions(desktop.extensions())
-				.layer(ValidationLayer.STANDARD_VALIDATION)
 				.build(lib);
 	}
 
 	@Bean
-	static Handler diagnostics(Instance instance) {
-		return new Handler.Builder().build(instance);
+	static DiagnosticHandler diagnostics(Instance instance) {
+		return new DiagnosticHandler.Builder().build(instance, DefaultRegistry.create());
 	}
 }
